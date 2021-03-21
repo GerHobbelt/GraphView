@@ -26,10 +26,17 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+using GraphView.TSQL_Syntax_Tree;
 
 namespace GraphView
 {
+    public enum SortOrder
+    {
+        Ascending,
+        Descending,
+        NotSpecified,
+    }
+
     public abstract partial class WGroupingSpecification : WSqlFragment { }
 
     public partial class WCompositeGroupingSpec : WGroupingSpecification

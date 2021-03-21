@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using GraphView.TSQL_Syntax_Tree;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace GraphView
@@ -38,6 +39,11 @@ namespace GraphView
     public partial class WFromClause : WSqlFragment
     {
         internal IList<WTableReference> TableReferences { get; set; }
+
+        public WFromClause()
+        {
+            TableReferences = new List<WTableReference>();
+        }
 
         internal override bool OneLine()
         {
@@ -56,7 +62,7 @@ namespace GraphView
                 {
                     sb.Append(", ");
                 }
-
+                
                 if (TableReferences[i].OneLine())
                 {
                     sb.Append(TableReferences[i].ToString(""));
@@ -64,7 +70,7 @@ namespace GraphView
                 else
                 {
                     sb.Append("\r\n");
-                    sb.Append(TableReferences[i].ToString(indent + " "));
+                    sb.Append(TableReferences[i].ToString(indent + "  "));
                 }
             }
 
@@ -479,7 +485,9 @@ namespace GraphView
                     PathEdgeList[index].Item2.Accept(visitor);
                 }
             }
-            Tail.Accept(visitor);
+
+            Tail?.Accept(visitor);
+
             base.AcceptChildren(visitor);
         }
 
@@ -492,24 +500,52 @@ namespace GraphView
         {
             StringBuilder sb = new StringBuilder(64);
 
-            sb.AppendFormat("{0}{1}-[{2}]->", 
-                indent, 
-                PathEdgeList[0].Item1.BaseIdentifier.Value, 
-                PathEdgeList[0].Item2.ToString("")
-            );
-            for (int i = 1; i < PathEdgeList.Count; i++) 
+            sb.Append(indent);
+            for (int i = 0; i < PathEdgeList.Count; i++)
             {
-                sb.AppendFormat("{0}-[{1}]->", PathEdgeList[i].Item1.BaseIdentifier.Value,
-                    PathEdgeList[i].Item2.ToString(""));
+                string arrowSource;
+                string arrowSink;
+                switch (PathEdgeList[i].Item2.EdgeType)
+                {
+                    case WEdgeType.BothEdge:
+                        arrowSource = "-";
+                        arrowSink = "-";
+                        break;
+                    case WEdgeType.InEdge:
+                        arrowSource = "<-";
+                        arrowSink = "-";
+                        break;
+                    case WEdgeType.OutEdge:
+                        arrowSource = "-";
+                        arrowSink = "->";
+                        break;
+                    default:
+                        arrowSource = "-";
+                        arrowSink = "->";
+                        break;
+                }
+                sb.AppendFormat("{0}{1}", PathEdgeList[i].Item1.BaseIdentifier.Value, arrowSource);
+                sb.AppendFormat("[{0}]", PathEdgeList[i].Item2);
+                if (Tail != null)
+                {
+                    sb.Append(arrowSink);
+                }
             }
-            sb.Append(Tail.BaseIdentifier.Value);
-
+            if (Tail != null)
+            {
+                sb.Append(Tail.BaseIdentifier.Value);
+            }
             return sb.ToString();
         }
     }
     public partial class WMatchClause : WSqlFragment
     {
         internal IList<WMatchPath> Paths { get; set; }
+
+        public WMatchClause()
+        {
+            Paths = new List<WMatchPath>();
+        }
 
         public override void Accept(WSqlFragmentVisitor visitor)
         {
@@ -537,16 +573,25 @@ namespace GraphView
         {
             StringBuilder sb = new StringBuilder(128);
 
-            sb.AppendFormat("{0}MATCH {1}", indent, Paths[0].ToString());
-
-            for (int i = 1; i < Paths.Count; i++)
+            sb.AppendFormat("{0}MATCH ", indent);
+            if (Paths.Count > 0)
             {
-                sb.Append("\r\n");
-                sb.AppendFormat("  {0}{1}", indent, Paths[i].ToString());
+                sb.AppendFormat("{0}", Paths[0].ToString());
+
+                for (int i = 1; i < Paths.Count; i++)
+                {
+                    sb.Append("\r\n");
+                    sb.AppendFormat("  {0}{1}", indent, Paths[i].ToString());
+                }
             }
 
             return sb.ToString();
         }
+    }
+
+    public partial class WLimitClause : WSqlFragment
+    {
+        internal int Limit { get; set; }
     }
 
 }

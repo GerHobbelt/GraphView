@@ -25,70 +25,32 @@
 // 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
-using System.Data;
-using System.Data.SqlClient;
-using System.Globalization;
-using System.Diagnostics;
-using System.IO;
+using System.Runtime.Serialization;
+
 
 namespace GraphView
 {
-    public partial class GraphViewCommand : IDisposable
+    [Serializable]
+    public class GraphViewCommand : IDisposable, ISerializable
     {
-        /// <summary>
-        /// Returns the translated T-SQL script. For testing only.
-        /// </summary>
-        /// <returns>The translated T-SQL script</returns>
-        internal string GetTsqlQuery()
-        {
-            var sr = new StringReader(CommandText);
-            var parser = new GraphViewParser();
-            IList<ParseError> errors;
-            var script = parser.Parse(sr, out errors) as WSqlScript;
-            if (errors.Count > 0)
-                throw new SyntaxErrorException(errors);
+        public GraphViewConnection Connection { get; set; }
 
-            if (errors.Count > 0)
-                throw new SyntaxErrorException(errors);
+        public VertexObjectCache VertexCache { get; private set; }
 
-            // Translation and Check CheckInvisibleColumn
-            using (SqlTransaction tx = GraphViewConnection.BeginTransaction())
-            {
-                var visitor = new TranslateMatchClauseVisitor(tx);
-                visitor.Invoke(script);
-
-                return script.ToString();
-            }
-        }
-
-        public CommandType CommandType
-        {
-            get { return Command.CommandType; }
-            set { Command.CommandType = value; }
-        }
-        public GraphViewConnection GraphViewConnection { get; set; }
+        public bool InLazyMode { get; set; } = false;
         
         public string CommandText { get; set; }
 
-        public int CommandTimeOut
-        {
-            get { return Command.CommandTimeout; }
-            set { Command.CommandTimeout = value; }
-        }
-        public SqlParameterCollection Parameters
-        {
-            get { return Command.Parameters; }
-        }
-        internal SqlCommand Command { get; private set; }
-
-        internal SqlTransaction Tx { get; private set; }
+        public OutputFormat OutputFormat { get; set; }
 
 
-        public GraphViewCommand()
+        private int indexColumnCount;
+        public string IndexColumnName => (indexColumnCount++).ToString();
+
+        public GraphViewCommand(GraphViewConnection connection)
         {
+            this.Connection = connection;
+            this.VertexCache = new VertexObjectCache(this);
         }
 
         public GraphViewCommand(string commandText)
@@ -99,157 +61,62 @@ namespace GraphView
         public GraphViewCommand(string commandText, GraphViewConnection connection)
         {
             CommandText = commandText;
-            GraphViewConnection = connection;
-            Command = GraphViewConnection.Conn.CreateCommand();
+            this.Connection = connection;
         }
 
-        public GraphViewCommand(string commandText, GraphViewConnection connection, SqlTransaction transaction)
+        protected GraphViewCommand(SerializationInfo info, StreamingContext context)
         {
-            CommandText = commandText;
-            GraphViewConnection = connection;
-            Command = GraphViewConnection.Conn.CreateCommand();
-            Tx = transaction;
+            this.Connection = (GraphViewConnection)info.GetValue("Connection", typeof(GraphViewConnection));
+            this.InLazyMode = info.GetBoolean("InLazyMode");
+            this.OutputFormat = (OutputFormat)info.GetValue("OutputFormat", typeof(OutputFormat));
+            this.VertexCache = new VertexObjectCache(this);
+            // CommandText and indexColumnCount don't need be serialized and deserialized.
         }
 
-        public void CreateParameter()
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            Command.CreateParameter();
+            info.AddValue("Connection", this.Connection, typeof(GraphViewConnection));
+            info.AddValue("InLazyMode", this.InLazyMode, typeof(bool));
+            info.AddValue("OutputFormat", this.OutputFormat, typeof(OutputFormat));
         }
 
-        public void Cancel()
+        // we need this method to test command-serialization.
+        public void SetCommand(GraphViewCommand command)
         {
-            Command.Cancel();
+            this.Connection = command.Connection;
+            this.VertexCache = command.VertexCache;
+            this.InLazyMode = command.InLazyMode;
+            this.OutputFormat = command.OutputFormat;
+            this.CommandText = command.CommandText;
+            this.indexColumnCount = command.indexColumnCount;
         }
 
-#if DEBUG
-        // For debugging
-        private void OutputResult(string input, string output)
+        public IEnumerable<string> Execute()
         {
-            Trace.WriteLine("Input string: \n" + input + "\n");
-            Trace.WriteLine("Output string: \n" + output);
-        }
-#endif
-
-        public SqlDataReader ExecuteReader()
-        {
-            try
+            if (CommandText == null)
             {
-                if (CommandType == CommandType.StoredProcedure)
-                {
-                    if (Tx != null)
-                    {
-                        Command.Transaction = Tx;
-                    }
-                    Command.CommandText = CommandText;
-                    return Command.ExecuteReader();
-                }
-
-                var sr = new StringReader(CommandText);
-                var parser = new GraphViewParser();
-                IList<ParseError> errors;
-                var script = parser.Parse(sr, out errors) as WSqlScript;
-                if (errors.Count > 0)
-                    throw new SyntaxErrorException(errors);
-
-                if (Tx == null)
-                {
-                    var translationConnection = GraphViewConnection.TranslationConnection;
-
-                    using (SqlTransaction translationTx = translationConnection.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
-                    {
-                        var visitor = new TranslateMatchClauseVisitor(translationTx);
-                        visitor.Invoke(script);
-
-                        // Executes translated SQL 
-                        Command.CommandText = script.ToString();
-#if DEBUG
-                        // For debugging
-                        OutputResult(CommandText, Command.CommandText);
-                        //throw new GraphViewException("No Execution");
-#endif
-                        var reader = Command.ExecuteReader();
-                        translationTx.Commit();
-                        return reader;
-                    }
-                }
-                else
-                {
-                    var visitor = new TranslateMatchClauseVisitor(Tx);
-                    visitor.Invoke(script);
-                    // Executes translated SQL 
-                    Command.CommandText = script.ToString();
-#if DEBUG
-                    // For debugging
-                    OutputResult(CommandText, Command.CommandText);
-                    //throw new GraphViewException("No Execution");
-#endif
-                    var reader = Command.ExecuteReader();
-                    return reader;
-                }
+                throw new QueryExecutionException("CommandText of GraphViewCommand is not set.");
             }
-            catch (SqlException e)
-            {
-                throw new SqlExecutionException("An error occurred when executing the query", e);
-            }
+            return g().EvalGremlinTraversal(CommandText);
         }
 
-        public int ExecuteNonQuery()
+        public List<string> ExecuteAndGetResults()
         {
-            try
+            List<string> results = new List<string>();
+            foreach (var result in Execute())
             {
-                if (CommandType == CommandType.StoredProcedure)
-                {
-                    if (Tx != null)
-                    {
-                        Command.Transaction = Tx;
-                    }
-                    Command.CommandText = CommandText;
-                    return Command.ExecuteNonQuery();
-                }
-
-                var sr = new StringReader(CommandText);
-                var parser = new GraphViewParser();
-                IList<ParseError> errors;
-                var script = parser.Parse(sr, out errors) as WSqlScript;
-                if (errors.Count > 0)
-                    throw new SyntaxErrorException(errors);
-
-                bool externalTransaction = true;
-                if (Tx == null)
-                {
-                    externalTransaction = false;
-                    Tx = GraphViewConnection.BeginTransaction();
-                }
-
-                // Translation
-                var modVisitor = new TranslateDataModificationVisitor(Tx);
-                modVisitor.Invoke(script);
-                var matchVisitor = new TranslateMatchClauseVisitor(Tx);
-                matchVisitor.Invoke(script);
-
-                Command.CommandText = script.ToString();
-                Command.Transaction = Tx;
-#if DEBUG
-                // For debugging
-                OutputResult(CommandText, Command.CommandText);
-#endif
-                int res = Command.ExecuteNonQuery();
-                if (!externalTransaction)
-                {
-                    Tx.Commit();
-                    Tx.Dispose();
-                    Tx = null;
-                }
-                return res;
+                results.Add(result);
             }
-            catch (SqlException e)
-            {
-                throw new SqlExecutionException("An error occurred when executing the query", e);
-            }
+            return results;
         }
+
         public void Dispose()
         {
-            Command.Dispose();
+        }
+
+        public GraphTraversal g()
+        {
+            return new GraphTraversal(this, OutputFormat);
         }
     }
 }

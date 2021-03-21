@@ -27,11 +27,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
+using GraphView.TSQL_Syntax_Tree;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace GraphView
 {
+    public enum BinaryQueryExpressionType
+    {
+        Except,
+        Intersect,
+        Union
+    }
+
+    public enum UniqueRowFilter
+    {
+        All,
+        Distinct,
+        NotSpecified
+    }
+
     /// <summary>
     /// The base class of a SELECT statement
     /// </summary>
@@ -46,7 +60,7 @@ namespace GraphView
         internal override bool OneLine()
         {
             return false;
-        } 
+        }
 
         internal override string ToString(string indent)
         {
@@ -75,6 +89,8 @@ namespace GraphView
             if (QueryExpr != null)
                 QueryExpr.Accept(visitor);
             base.AcceptChildren(visitor);
+
+
         }
     }
 
@@ -201,19 +217,23 @@ namespace GraphView
         internal WGroupByClause GroupByClause { get; set; }
         internal WHavingClause HavingClause { get; set; }
         internal WMatchClause MatchClause { get; set; }
+        internal WLimitClause LimitClause { get; set; }
+        internal WWithPathClause WithPathClause { get; set; }
+        internal WWithPathClause2 WithPathClause2 { get; set; }
         internal UniqueRowFilter UniqueRowFilter { get; set; }
+        internal bool OutputPath { get; set; }
 
         public WSelectQueryBlock()
         {
-            FromClause = new WFromClause();
-            WhereClause = new WWhereClause();
+            SelectElements = new List<WSelectElement>();
         }
 
         internal override bool OneLine()
         {
-            if (FromClause == null && 
-                WhereClause == null && 
-                OrderByClause == null && 
+            if (FromClause == null &&
+                MatchClause == null &&
+                WhereClause == null &&
+                OrderByClause == null &&
                 GroupByClause == null)
             {
                 return SelectElements.All(sel => sel.OneLine());
@@ -224,6 +244,11 @@ namespace GraphView
         internal override string ToString(string indent)
         {
             var sb = new StringBuilder(1024);
+
+            if (WithPathClause2 != null)
+            {
+                sb.Append(WithPathClause2.ToString(indent));
+            }
 
             sb.AppendFormat("{0}SELECT ", indent);
 
@@ -273,7 +298,7 @@ namespace GraphView
                 sb.AppendFormat(" INTO {0} ", Into);
             }
 
-            if (FromClause.TableReferences != null)
+            if (FromClause != null)
             {
                 sb.Append("\r\n");
                 sb.Append(FromClause.ToString(indent));
@@ -285,7 +310,7 @@ namespace GraphView
                 sb.Append(MatchClause.ToString(indent));
             }
 
-            if (WhereClause.SearchCondition != null || !string.IsNullOrEmpty(WhereClause.GhostString))
+            if (WhereClause != null && (WhereClause.SearchCondition != null || !string.IsNullOrEmpty(WhereClause.GhostString)))
             {
                 sb.Append("\r\n");
                 sb.Append(WhereClause.ToString(indent));
@@ -322,6 +347,8 @@ namespace GraphView
         {
             if (FromClause != null)
                 FromClause.Accept(visitor);
+            if (MatchClause != null)
+                MatchClause.Accept(visitor);
             if (WhereClause != null)
                 WhereClause.Accept(visitor);
             if (TopRowFilter != null)
@@ -340,11 +367,13 @@ namespace GraphView
 
             base.AcceptChildren(visitor);
         }
+
+
     }
 
     public partial class WSelectQueryBlockWithMatchClause : WSelectQueryBlock
     {
-        
+
     }
 
     public partial class WTopRowFilter : WSqlFragment
@@ -400,4 +429,64 @@ namespace GraphView
             base.AcceptChildren(visitor);
         }
     }
+
+    public partial class WWithPathClause : WSqlStatement
+    {
+        // Definition of a path: 
+        // item1 is the binding name
+        // item2 is the path description
+        // item3 is the length limitation of it (-1 for no limitation)
+        internal List<Tuple<string, WSelectQueryBlock, int>> Paths;
+        internal List<Tuple<string, GraphViewExecutionOperator, int>> PathOperators;
+
+        public WWithPathClause(List<Tuple<string, WSelectQueryBlock, int>> pPaths)
+        {
+            Paths = pPaths;
+            PathOperators = new List<Tuple<string, GraphViewExecutionOperator, int>>();
+        }
+
+        public WWithPathClause(Tuple<string, WSelectQueryBlock, int> path)
+        {
+            PathOperators = new List<Tuple<string, GraphViewExecutionOperator, int>>();
+            if (Paths == null) Paths = new List<Tuple<string, WSelectQueryBlock, int>>();
+            Paths.Add(path);
+        }
+
+    }
+
+    public partial class WWithPathClause2 : WSqlFragment
+    {
+
+        internal Dictionary<string, GraphViewExecutionOperator> PathOperators;
+        internal Dictionary<string, WRepeatPath> Paths;
+
+        public WWithPathClause2(Dictionary<string, WRepeatPath> pPaths)
+        {
+            Paths = pPaths;
+            PathOperators = new Dictionary<string, GraphViewExecutionOperator>();
+        }
+
+        internal override string ToString(string indent)
+        {
+            var sb = new StringBuilder(32);
+
+            if (Paths.Count > 0)
+            {
+                sb.AppendFormat("{0}With ", indent);
+                sb.Append(Paths.ElementAt(0).Key + " AS " + "\r\n" + Paths.ElementAt(0).Value.ToString());
+                for (var i = 1; i < Paths.Count; i++)
+                {
+                    sb.Append("\r\n");
+                    sb.Append(", " + Paths.ElementAt(i).Key + " AS " + "\r\n" + Paths.ElementAt(i).Value.ToString());
+                }
+
+                sb.Append("\r\n");
+            }
+            return sb.ToString();
+        }
+
+
+    }
+
 }
+

@@ -23,16 +23,22 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using GraphView.GraphViewDBPortal;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace GraphView
 {
-    public partial class WMultiPartIdentifier : WSqlFragment
+    [Serializable]
+    public partial class WMultiPartIdentifier : WSqlFragment, ISerializable
     {
         public IList<Identifier> Identifiers { get; set; }
+
         public WMultiPartIdentifier(params Identifier[] identifiers)
         {
             Identifiers = identifiers.ToList();
@@ -64,10 +70,36 @@ namespace GraphView
                 {
                     sb.Append('.');
                 }
-                sb.Append("["+Identifiers[i].Value+"]");
+                sb.Append(Identifiers[i].Value);
             }
 
             return sb.ToString();
+        }
+
+        internal override string ToString(string indent, bool useSquareBracket)
+        {
+            var sb = new StringBuilder(16);
+
+            for (var i = 0; i < Identifiers.Count; i++)
+            {
+                if (i > 0)
+                {
+                    sb.Append('.');
+                }
+                sb.Append("[" + Identifiers[i].Value + "]");
+            }
+
+            return sb.ToString();
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            GraphViewSerializer.SerializeList(info, "Identifiers", this.Identifiers.ToList());
+        }
+
+        protected WMultiPartIdentifier(SerializationInfo info, StreamingContext context)
+        {
+            this.Identifiers = GraphViewSerializer.DeserializeList<Identifier>(info, "Identifiers");
         }
     }
 

@@ -23,15 +23,52 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+using GraphView.TSQL_Syntax_Tree;
+
+//using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace GraphView
 {
+    public enum BinaryExpressionType
+    {
+        Add,
+        BitwiseAnd,
+        BitwiseOr,
+        BitwiseXor,
+        StringConcatenate,
+        Divide,
+        Modulo,
+        Multiply,
+        Subtract
+    }
+
+    public enum UnaryExpressionType
+    {
+        BitwiseNot,
+        Negative,
+        Positive
+    }
+
+    public enum ColumnType
+    {
+        IdentityCol,
+        PseudoColumnAction,
+        PseudoColumnCuid,
+        PseudoColumnIdentity,
+        PseudoColumnRowGuid,
+        Regular,
+        RowGuidCol,
+        Wildcard
+    }
+
+    [Serializable]
     public abstract partial class WScalarExpression : WSqlFragment 
     {
     }
@@ -121,10 +158,14 @@ namespace GraphView
         }
     }
 
+    [Serializable]
     public abstract partial class WPrimaryExpression : WScalarExpression { }
 
     public partial class WEdgeColumnReferenceExpression : WColumnReferenceExpression
     {
+        internal WEdgeType EdgeType;
+        internal string FirstEdgeAlias;
+
         internal string Alias;
         internal int MinLength { get; set; }
         internal int MaxLength { get; set; }
@@ -137,16 +178,39 @@ namespace GraphView
 
         internal override string ToString(string indent)
         {
+            StringBuilder sb = new StringBuilder(64);
             if (Alias == null || Alias.Length == 0) 
             {
-                return string.Format("{0}{1}", indent, MultiPartIdentifier.ToString());
+                sb.Append(string.Format("{0}{1}", indent, MultiPartIdentifier.ToString()));
             }
             else
             {
-                return string.Format("{0}{1} AS {2}", indent, MultiPartIdentifier.ToString(), Alias);
+                sb.Append(string.Format("{0}{1} AS {2}", indent, MultiPartIdentifier.ToString(), Alias));
             }
-            
+            return sb.ToString();
         }
+    }
+
+    public enum WEdgeType
+    {
+        Undefined,
+        InEdge,
+        OutEdge,
+        BothEdge
+    }
+
+    public enum ColumnGraphType
+    {
+        Value,
+        VertexId,
+        VertexObject,
+        EdgeObject,
+        EdgeSource,
+        EdgeId,
+        EdgeSink,
+        OutAdjacencyList,
+        InAdjacencyList,
+        BothAdjacencyList
     }
 
     /// <summary>
@@ -156,16 +220,35 @@ namespace GraphView
     /// This class represents columns as scalar expressions.
     /// In particular, when WColumnReferenceExpression is of type *, it appears in function calls such as COUNT(*)
     /// </summary>
+    [Serializable]
     public partial class WColumnReferenceExpression : WPrimaryExpression
     {
         internal WMultiPartIdentifier MultiPartIdentifier { get; set; }
         internal ColumnType ColumnType { get; set; }
+        internal ColumnGraphType ColumnGraphType { get; set; }
 
-        // MultiPartIdentifier cannot be modified externally. 
-        // This data structure is used when we need to add new column references to the parsed tree. 
+        public WColumnReferenceExpression() { }
 
-        public WColumnReferenceExpression() {}
+        public WColumnReferenceExpression(string tableName, string columnName)
+        {
+            ColumnType = ColumnType.Regular;
 
+            Identifier tableIdent = tableName != null ? new Identifier { Value = tableName } : null;
+            Identifier columnIdent = columnName != null ? new Identifier { Value = columnName } : null;
+
+            MultiPartIdentifier = new WMultiPartIdentifier(tableIdent, columnIdent);
+        }
+
+        public WColumnReferenceExpression(string tableName, string columnName, ColumnGraphType columnGraphType)
+        {
+            ColumnType = ColumnType.Regular;
+            ColumnGraphType = columnGraphType;
+
+            Identifier tableIdent = tableName != null ? new Identifier { Value = tableName } : null;
+            Identifier columnIdent = columnName != null ? new Identifier { Value = columnName } : null;
+
+            MultiPartIdentifier = new WMultiPartIdentifier(tableIdent, columnIdent);
+        }
 
         internal void Add(Identifier identifier)
         {
@@ -185,6 +268,24 @@ namespace GraphView
             Add(ident);
         }
 
+        public string ColumnName
+        {
+            get
+            {
+                switch (MultiPartIdentifier.Count)
+                {
+                    case 1:
+                        return MultiPartIdentifier[0].Value;
+                    case 2:
+                        return MultiPartIdentifier[1].Value;
+                    default:
+                        return null;
+                }
+            }
+        }
+
+        public string TableReference => MultiPartIdentifier.Count == 2 ? MultiPartIdentifier[0].Value : null;
+
         internal override bool OneLine()
         {
             return true;
@@ -192,40 +293,18 @@ namespace GraphView
 
         internal override string ToString(string indent)
         {
-            switch (ColumnType)
-            {
-                case ColumnType.Regular:
-                {
-                    return MultiPartIdentifier != null
-                        ? string.Format(CultureInfo.CurrentCulture, "{0}{1}", indent,
-                            MultiPartIdentifier)
-                        : "";
-                }
-                case ColumnType.Wildcard:
-                    {
-                        return string.Format(CultureInfo.CurrentCulture, "{0}*", indent);
-                    }
-                default:
-                    throw new GraphViewException("Undefined column type");
-            }
+            return MultiPartIdentifier != null
+                ? string.Format(CultureInfo.CurrentCulture, "{0}{1}", indent,
+                    MultiPartIdentifier)
+                : "";
         }
 
-        internal static WColumnReferenceExpression CreateColumnExpression(string tableName, string columnName)
+        internal override string ToString(string indent, bool useSquareBracket)
         {
-            var columnExpr = new WColumnReferenceExpression { ColumnType = ColumnType.Regular };
-
-            if (tableName != null)
-            {
-                var tabIdent = new Identifier { Value = tableName };
-                columnExpr.Add(tabIdent);
-            }
-
-            if (columnName == null) return columnExpr;
-
-            var colIdent = new Identifier { Value = columnName };
-            columnExpr.Add(colIdent);
-
-            return columnExpr;
+            return MultiPartIdentifier != null
+                ? string.Format(CultureInfo.CurrentCulture, "{0}{1}", indent,
+                    MultiPartIdentifier.ToString("", useSquareBracket))
+                : "";
         }
 
         public override void Accept(WSqlFragmentVisitor visitor)
@@ -233,26 +312,57 @@ namespace GraphView
             if (visitor != null)
                 visitor.Visit(this);
         }
+
+        public override bool Equals(object obj)
+        {
+            WColumnReferenceExpression colRef = obj as WColumnReferenceExpression;
+            if (colRef == null || MultiPartIdentifier.Count != colRef.MultiPartIdentifier.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < MultiPartIdentifier.Count; i++)
+            {
+                if (MultiPartIdentifier[i].Value != colRef.MultiPartIdentifier[i].Value)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return ToString("").GetHashCode();
+        }
     }
 
     public partial class WScalarSubquery : WPrimaryExpression
     {
-        internal WSelectQueryExpression SubQueryExpr { get; set; }
+        //internal WSelectQueryExpression SubQueryExpr { get; set; }
+        internal WSqlStatement SubQueryExpr { get; set; }
 
         internal override bool OneLine()
         {
-            return false;
+            return SubQueryExpr.OneLine();
         }
 
         internal override string ToString(string indent)
         {
-            var sb = new StringBuilder(128);
+            if (OneLine())
+            {
+                return string.Format("{0}({1})", indent, SubQueryExpr.ToString(""));
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0}(\r\n", indent);
+                sb.Append(SubQueryExpr.ToString(indent + "  "));
+                sb.AppendFormat("\r\n{0})", indent);
 
-            sb.AppendFormat("{0}(\r\n", indent);
-            sb.AppendFormat("{0}\r\n", SubQueryExpr.ToString(indent));
-            sb.AppendFormat("{0})", indent);
-
-            return sb.ToString();
+                return sb.ToString();
+            }
         }
 
         public override void Accept(WSqlFragmentVisitor visitor)
@@ -348,12 +458,13 @@ namespace GraphView
     /// <summary>
     /// A value expression can be a variable or a literal. 
     /// </summary>
+    [Serializable]
     public partial class WValueExpression : WPrimaryExpression 
     {
         internal string Value { get; set; }
         internal bool SingleQuoted { get; set; }
 
-        public WValueExpression(string value, bool quoted)
+        public WValueExpression(string value, bool quoted = false)
         {
             Value = value;
             SingleQuoted = quoted;
@@ -370,10 +481,49 @@ namespace GraphView
             return string.Format(CultureInfo.CurrentCulture, SingleQuoted ? "{0}'{1}'" : "{0}{1}", indent, Value);
         }
 
+        internal StringField ToStringField()
+        {
+            if (this.SingleQuoted)
+            {
+                return new StringField(this.Value, JsonDataType.String);
+            }
+
+            bool boolValue;
+            if (bool.TryParse(this.Value, out boolValue))
+            {
+                return new StringField(this.Value, JsonDataType.Boolean);
+            }
+
+            return new StringField(this.Value, JsonDataType.Unknown);
+        }
+
         public override void Accept(WSqlFragmentVisitor visitor)
         {
             if (visitor != null)
                 visitor.Visit(this);
+        }
+    }
+
+    public partial class WVariableReference : WValueExpression
+    {
+        public WVariableReference() {}
+
+        public string Name { get; set; }
+
+        internal override string ToString(string indent)
+        {
+            return Name;
+        }
+
+        public override void Accept(WSqlFragmentVisitor visitor)
+        {
+            if (visitor != null)
+                visitor.Visit(this);
+        }
+
+        public override void AcceptChildren(WSqlFragmentVisitor visitor)
+        {
+            //TODO
         }
     }
 
@@ -541,5 +691,134 @@ namespace GraphView
                 Parameter.Accept(visitor);
             base.AcceptChildren(visitor);
         }
+    }
+
+    public class WRepeatConditionExpression: WPrimaryExpression
+    {
+        internal bool EmitContext { get; set; }
+        internal bool StartFromContext { get; set; }
+        internal int RepeatTimes { get; set; }
+        internal WBooleanExpression EmitCondition { get; set; }
+        internal WBooleanExpression TerminationCondition { get; set; }
+
+        internal override bool OneLine()
+        {
+            return false;
+        }
+
+        public override void Accept(WSqlFragmentVisitor visitor)
+        {
+            if (visitor != null)
+                visitor.Visit(this);
+        }
+
+        public override void AcceptChildren(WSqlFragmentVisitor visitor)
+        {
+            if (EmitCondition != null)
+                EmitCondition.Accept(visitor);
+            if (TerminationCondition != null)
+                TerminationCondition.Accept(visitor);
+            base.AcceptChildren(visitor);
+        }
+
+        internal override string ToString(string indent)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendFormat("{0}RepeatCondition(", indent);
+            if (RepeatTimes >= 0)
+            {
+                sb.Append(RepeatTimes);
+            }
+            else
+            {
+                sb.Append("\r\n");
+                sb.Append(TerminationCondition?.ToString(indent + "  "));
+            }
+
+            if (EmitCondition != null)
+            {
+                sb.Append(",\r\n");
+                sb.Append(EmitCondition?.ToString(indent + "  "));
+            }
+
+            sb.Append(")");
+
+            return sb.ToString();
+        }
+    }
+
+    public class WColumnNameList : WPrimaryExpression
+    {
+        internal List<WValueExpression> ColumnNameList { get; set; }
+
+        public WColumnNameList(List<WValueExpression> columnNameList)
+        {
+            ColumnNameList = columnNameList;
+        }
+
+        internal override bool OneLine()
+        {
+            return true;
+        }
+
+        public override void Accept(WSqlFragmentVisitor visitor)
+        {
+            if (visitor != null)
+                visitor.Visit(this);
+        }
+
+        internal override string ToString(string indent)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendFormat("{0}(", indent);
+            for (var i = 0; i < ColumnNameList.Count; i++)
+            {
+                if (i == 0)
+                    sb.AppendFormat("{0}", ColumnNameList[i].ToString(""));
+                else
+                    sb.AppendFormat(", {0}", ColumnNameList[i].ToString(""));
+            }
+
+            sb.Append(")");
+
+            return sb.ToString();
+        }
+    }
+
+    public enum QuoteType
+    {
+        NotQuoted = 0,
+        DoubleQuote, 
+        SquareBracket
+    }
+
+    [Serializable]
+    public class Identifier : WSqlFragment
+    {
+        public string Value { get; set; }
+        public QuoteType QuoteType { get; set; }
+
+        public Identifier() { }
+
+        internal override bool OneLine()
+        {
+            return true;
+        }
+
+        internal override string ToString(string indent)
+        {
+            switch(QuoteType)
+            {
+                case QuoteType.DoubleQuote:
+                    return string.Format("{0}\"{1}\"", indent, Value);
+                case QuoteType.SquareBracket:
+                    return string.Format("{0}[{1}]", indent, Value);
+                default:
+                    return indent + Value;
+            }
+        }
+
     }
 }

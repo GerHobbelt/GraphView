@@ -23,11 +23,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using GraphView.TSQL_Syntax_Tree;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace GraphView
@@ -57,9 +54,12 @@ namespace GraphView
         {
             if (Identifier != null)
             {
-                return Identifier.EncodeIdentifier(Identifier.Value, Identifier.QuoteType);
+                return Identifier.ToString(indent);
             }
-            return ValueExpression == null ? null : ValueExpression.ToString(indent);
+            else
+            {
+                return ValueExpression == null ? null : ValueExpression.ToString(indent);
+            }
         }
 
         public override void Accept(WSqlFragmentVisitor visitor)

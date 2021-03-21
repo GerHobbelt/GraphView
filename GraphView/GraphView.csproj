@@ -11,6 +11,8 @@
     <AssemblyName>GraphView</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,6 +22,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <NoWarn>3008,0162,0169,0219,0414,0649</NoWarn>
+    <CodeAnalysisRuleSet>..\Analyze.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,10 +45,93 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.SqlServer.TransactSql.ScriptDom, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
+    <Reference Include="Cassandra, Version=3.99.0.0, Culture=neutral, PublicKeyToken=10b231fbfc8c4b4d, processorArchitecture=MSIL">
+      <HintPath>..\packages\CassandraCSharpDriver.3.4.1\lib\net45\Cassandra.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="JsonServer">
+      <HintPath>..\References\JsonServer.dll</HintPath>
+    </Reference>
+    <Reference Include="LZ4, Version=1.0.10.93, Culture=neutral, PublicKeyToken=62e1b5ec1eec9bdd, processorArchitecture=MSIL">
+      <HintPath>..\packages\lz4net.1.0.10.93\lib\net4-client\LZ4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Azure.Documents.Client, Version=1.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Azure.DocumentDB.1.9.5\lib\net45\Microsoft.Azure.Documents.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.1.0.0\lib\netstandard1.1\Microsoft.Extensions.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.1.0.0\lib\netstandard1.1\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.TransactSql.ScriptDom, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SqlServer.TransactSql.ScriptDom.14.0.3811.1\lib\net40\Microsoft.SqlServer.TransactSql.ScriptDom.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NonBlocking, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NonBlocking.1.0.2\lib\netstandard1.0\NonBlocking.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack, Version=3.9.71.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Redis.Complete.1.0.0\lib\net35\ServiceStack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Common, Version=1.0.4333.5581, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Redis.Complete.1.0.0\lib\net35\ServiceStack.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Redis.Complete.1.0.0\lib\net35\ServiceStack.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite, Version=3.0.3.5599, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Redis.Complete.1.0.0\lib\net35\ServiceStack.OrmLite.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite.SqlServer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Redis.Complete.1.0.0\lib\net35\ServiceStack.OrmLite.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Redis, Version=3.9.71.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Redis.Complete.1.0.0\lib\net35\ServiceStack.Redis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.ServiceInterface, Version=3.9.71.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Redis.Complete.1.0.0\lib\net35\ServiceStack.ServiceInterface.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Text, Version=3.9.71.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Redis.Complete.1.0.0\lib\net35\ServiceStack.Text.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.3.0\lib\netstandard1.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,81 +139,269 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AttachWhereClauseVisitor.cs" />
-    <Compile Include="BulkInsert.cs" />
-    <Compile Include="CheckTableReferencingVisitor.cs" />
-    <Compile Include="DeployScriptTemplate.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>DeployScriptTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Include="EdgeViewGraphViewCodeTemplate.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EdgeViewGraphViewCodeTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Include="MetaGraphViewCodeTemplate.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>MetaGraphViewCodeTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Include="NodeTableGraphViewCodeTemplate.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>NodeTableGraphViewCodeTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Include="ObjectExtensions.cs" />
-    <Compile Include="Statistics.cs" />
-    <Compile Include="ConvertGraphModificationStatementVisitor.cs" />
-    <Compile Include="CreateViewVisitor.cs" />
-    <Compile Include="DictionaryExtensions.cs" />
-    <Compile Include="EdgeViewBfsScriptTemplate.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EdgeViewBfsScriptTemplate.tt</DependentUpon>
-    </Compile>
+    <Compile Include="GraphViewDBPortal\CollectionType.cs" />
+    <Compile Include="GraphViewDBPortal\DocumentDbPortal.cs" />
+    <Compile Include="GraphViewDBPortal\JsonQuery.cs" />
+    <Compile Include="GraphViewDBPortal\JsonServerDbPortal.cs" />
+    <Compile Include="GraphViewDBPortal\DbPortal.cs" />
+    <Compile Include="GraphViewExecutionRuntime\AggregateOperator.cs" />
+    <Compile Include="GraphViewExecutionRuntime\BranchOperators.cs" />
+    <Compile Include="GraphViewExecutionRuntime\EdgeDocumentHelper.cs" />
+    <Compile Include="GraphViewExecutionRuntime\MapOperators.cs" />
+    <Compile Include="GraphViewExecutionRuntime\ModificationDataStructure.cs" />
+    <Compile Include="GraphViewExecutionRuntime\ModificationOperators.cs" />
+    <Compile Include="GraphViewExecutionRuntime\ModificationLazyCommit.cs" />
+    <Compile Include="GraphViewExecutionRuntime\SelectOperators.cs" />
+    <Compile Include="GraphViewExecutionRuntime\SubtraversalInput.cs" />
+    <Compile Include="GraphViewQueryCompiler\AggregationBlock.cs" />
+    <Compile Include="GraphViewExecutionRuntime\BooleanFunction.cs" />
+    <Compile Include="GraphViewQueryCompiler\ToDocDBStringVisitor.cs" />
+    <Compile Include="GraphViewQueryCompiler\ToJsonServerStringVisitor.cs" />
+    <Compile Include="GraphViewQueryCompiler\ExecutionOrder.cs" />
+    <Compile Include="GraphViewUtils\DictionaryExtensions.cs" />
+    <Compile Include="GraphViewQueryCompiler\CompileBooleanExpression.cs" />
+    <Compile Include="GraphViewQueryCompiler\CompileModification.cs" />
+    <Compile Include="GraphViewQueryCompiler\CompileScalarExpression.cs" />
+    <Compile Include="DocDBScript.cs" />
+    <Compile Include="GraphViewExecutionRuntime\ScalarFunction.cs" />
+    <Compile Include="GraphViewQueryCompiler\CompilerVisitors.cs" />
+    <Compile Include="GraphViewUtils\SamplingAlgorithm.cs" />
+    <Compile Include="GraphViewUtils\GraphViewSerializer.cs" />
+    <Compile Include="GraphViewUtils\WSqlParser.cs" />
+    <Compile Include="GremlinTranslation\operators\barrier\GremlinBarrierOp.cs" />
+    <Compile Include="GremlinTranslation\operators\barrier\GremlinCapOp.cs" />
+    <Compile Include="GremlinTranslation\operators\barrier\GremlinCommitOp.cs" />
+    <Compile Include="GremlinTranslation\operators\branch\GremlinChooseOp.cs" />
+    <Compile Include="GremlinTranslation\operators\branch\GremlinLocalOp.cs" />
+    <Compile Include="GremlinTranslation\operators\branch\GremlinRepeatOp.cs" />
+    <Compile Include="GremlinTranslation\operators\branch\GremlinUnionOp.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinAndOp.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinCoinOp.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinCyclicPathOp.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinDedupOp.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinDropOp.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinHasOp.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinIsOp.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinOrOp.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinRangeOp.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinSampleOp.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinSimplePathOp.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinWherePredicate.cs" />
+    <Compile Include="GremlinTranslation\operators\filter\GremlinWhereTraversal.cs" />
+    <Compile Include="GraphTraversal.cs" />
+    <Compile Include="GremlinTranslation\GremlinUtil.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinIdOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinLabelOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinMapOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinPathOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinPropertyMapOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinSelectColumnOp.cs" />
+    <Compile Include="GremlinTranslation\operators\sideEffect\GremlinAsOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinEOp.cs" />
+    <Compile Include="GremlinTranslation\GremlinKeyword.cs" />
+    <Compile Include="GremlinTranslation\operators\GremlinTranslationOperator.cs" />
+    <Compile Include="GremlinTranslation\operators\sideEffect\GremlinSubgraphOp.cs" />
+    <Compile Include="GremlinTranslation\operators\sideEffect\GremlinStoreOp.cs" />
+    <Compile Include="GremlinTranslation\SqlUtil.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinVOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinAddEOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinAddVOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinBothEOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinBothOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinBothVOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinCoalesceOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinConstantOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinCountOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinFlatMapOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinFoldOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinGroupOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinInEOP.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinInOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinInVOP.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinKeyOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinMaxOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinMeanOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinMinOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinNotOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinOptionalOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinOrderOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinOtherVOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinOutEOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinOutOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinOutVOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinProjectOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinPropertiesOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinSelectOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinSumOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinUnfoldOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinValueMapOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinValueOp.cs" />
+    <Compile Include="GremlinTranslation\operators\map\GremlinValuesOp.cs" />
+    <Compile Include="GremlinTranslation\Predicate.cs" />
+    <Compile Include="GremlinTranslation\operators\sideEffect\GremlinAggregateOp.cs" />
+    <Compile Include="GremlinTranslation\operators\sideEffect\GremlinInjectOp.cs" />
+    <Compile Include="GremlinTranslation\operators\sideEffect\GremlinPropertyOp.cs" />
+    <Compile Include="GremlinTranslation\operators\sideEffect\GremlinSideEffectOp.cs" />
+    <Compile Include="GremlinTranslation\operators\sideEffect\GremlinTreeOp.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinBarrierVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinCommitVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinCyclicPathVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinDecompose1Variable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinFilterVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinIdVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinLabelVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinPropertyMapVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinSelectColumnVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinSubgraphVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinChooseVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinSampleVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinSimplePathVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinTreeSideEffectVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinValueMapVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinOrderVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinAddEVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\edge\GremlinVertexToEdgeVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\GremlinContextVariable.cs" />
+    <Compile Include="GremlinTranslation\GremlinToSqlContext.cs" />
+    <Compile Include="GremlinTranslation\variables\GremlinVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\edge\GremlinFreeEdgeVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinAggregateVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinCoinVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinCountLocalVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinDedupVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinDropVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinMaxLocalVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinMeanLocalVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinMinLocalVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinPathVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinSelectVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinStoreVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinUnfoldVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinRangeVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinSumLocalVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinUpdatePropertiesVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinValuesVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinGroupVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinLocalVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinDerivedTableVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinKeyVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinMapVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinProjectVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\GremlinVariableProperty.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinCoalesceVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinConstantVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinFlatMapVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinOptionalVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinRepeatVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinSideEffectVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withSubquery\GremlinUnionVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinInjectVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinPropertiesVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\GremlinTableVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinValueVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\tvf\withoutSubquery\GremlinAddVVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\vertex\GremlinBoundVertexVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\vertex\GremlinEdgeToVertexVariable.cs" />
+    <Compile Include="GremlinTranslation\variables\table\vertex\GremlinFreeVertexVariable.cs" />
+    <Compile Include="GraphViewExecutionRuntime\TVFOperator.cs" />
+    <Compile Include="GraphViewQueryCompiler\ExecutionOrderOptimizer.cs" />
+    <Compile Include="GraphViewExecutionRuntime\GraphViewExecutionEngine.cs" />
+    <Compile Include="GraphViewUtils\GraphViewJsonCommand.cs" />
+    <Compile Include="GraphViewUtils\ObjectExtensions.cs" />
+    <Compile Include="GraphViewQueryCompiler\CompileSelect.cs" />
+    <Compile Include="GraphViewQueryCompiler\Statistics.cs" />
     <Compile Include="GraphViewCommand.cs" />
-    <Compile Include="GraphViewKeywords.cs" />
-    <Compile Include="GraphViewQuickAccess.cs" />
-    <Compile Include="MatchComponent.cs" />
-    <Compile Include="MatchGraphInterface.cs" />
-    <Compile Include="TSQL Syntax Tree\WAlterTableStatement.cs" />
+    <Compile Include="GraphViewDBPortal\DocumentDBKeywords.cs" />
+    <Compile Include="RecordRuntime\IDataStore.cs" />
+    <Compile Include="RecordRuntime\IndexSpecification.cs" />
+    <Compile Include="Transaction\BytesSerializer.cs" />
+    <Compile Include="Transaction\CassandraClusterManager.cs" />
+    <Compile Include="Transaction\CassandraLogConnectionPool.cs" />
+    <Compile Include="Transaction\CassandraLogStore.cs" />
+    <Compile Include="Transaction\HybridYCSBStoredProcedure.cs" />
+    <Compile Include="Transaction\PartitionedCassandraVersionDb.cs" />
+    <Compile Include="Transaction\CassandraVersionDbVisitor.cs" />
+    <Compile Include="Transaction\PartitionedCassandraVersionDbVisitor.cs" />
+    <Compile Include="Transaction\CassandraVersionTableVisitor.cs" />
+    <Compile Include="Transaction\PartitionedCassandraVersionTable.cs" />
+    <Compile Include="Transaction\PartitionedCassandraVersionTableVisitor.cs" />
+    <Compile Include="Transaction\RedisLuaResponse.cs" />
+    <Compile Include="Transaction\RedisVersionTableVisitor.cs" />
+    <Compile Include="Transaction\LogRequest.cs" />
+    <Compile Include="Transaction\CassandraVersionDb.cs" />
+    <Compile Include="Transaction\CassandraVersionTable.cs" />
+    <Compile Include="Transaction\SingletonPartitionedVersionDbVisitor.cs" />
+    <Compile Include="Transaction\SingletonPartitionedVersionTableVisitor.cs" />
+    <Compile Include="Transaction\PostProcessingEntry.cs" />
+    <Compile Include="Transaction\ReadSetEntry.cs" />
+    <Compile Include="Transaction\RedisClientManager.cs" />
+    <Compile Include="Transaction\RedisConnectionPool.cs" />
+    <Compile Include="Transaction\RedisLuaScriptManager.cs" />
+    <Compile Include="Transaction\RedisRequest.cs" />
+    <Compile Include="Transaction\RedisResponseVisitor.cs" />
+    <Compile Include="Transaction\RedisRequestVisitor.cs" />
+    <Compile Include="Transaction\RedisVersionDb.cs" />
+    <Compile Include="Transaction\RedisVersionDbVisitor.cs" />
+    <Compile Include="Transaction\RedisVersionTable.cs" />
+    <Compile Include="Transaction\RequestQueue.cs" />
+    <Compile Include="Transaction\SingletonPartitionedVersionDb.cs" />
+    <Compile Include="Transaction\SingletonPartitionedVersionTable.cs" />
+    <Compile Include="Transaction\SingletonVersionDb.cs" />
+    <Compile Include="Transaction\SingletonVersionDbVisitor.cs" />
+    <Compile Include="Transaction\SingletonVersionDictionaryTable.cs" />
+    <Compile Include="Transaction\SingletonVersionDictListVisitor.cs" />
+    <Compile Include="Transaction\SingletonVersionTableVisitor.cs" />
+    <Compile Include="Transaction\SingletonVersionTreeMapTable.cs" />
+    <Compile Include="Transaction\StoredProcedure.cs" />
+    <Compile Include="Transaction\StoredProcedureFactory.cs" />
+    <Compile Include="Transaction\StoredProcedureWorkload.cs" />
+    <Compile Include="Transaction\TransactionExecution.cs" />
+    <Compile Include="Transaction\TransactionExecutor.cs" />
+    <Compile Include="Transaction\TransactionRequest.cs" />
+    <Compile Include="Transaction\TxList.cs" />
+    <Compile Include="Transaction\TxObjPoolList.cs" />
+    <Compile Include="Transaction\TxRequest.cs" />
+    <Compile Include="Transaction\TxRequestVisitor.cs" />
+    <Compile Include="Transaction\TxResourceManager.cs" />
+    <Compile Include="Transaction\TxSetEntry.cs" />
+    <Compile Include="Transaction\TxStatus.cs" />
+    <Compile Include="Transaction\TxTableEntry.cs" />
+    <Compile Include="Transaction\VersionBlob.cs" />
+    <Compile Include="Transaction\VersionDbVisitor.cs" />
+    <Compile Include="Transaction\VersionKeyEntry.cs" />
+    <Compile Include="Transaction\VersionPrimaryKey.cs" />
+    <Compile Include="Transaction\VersionDb.cs" />
+    <Compile Include="Transaction\VersionEntry.cs" />
+    <Compile Include="Transaction\VersionList.cs" />
+    <Compile Include="Transaction\VersionTable.cs" />
+    <Compile Include="Transaction\ILogStore.cs" />
+    <Compile Include="Transaction\Transaction.cs" />
+    <Compile Include="Transaction\VersionTableVisitor.cs" />
+    <Compile Include="Transaction\WriteSetEntry.cs" />
+    <Compile Include="Transaction\YCSBStoredProcedure.cs" />
+    <Compile Include="TSQL Syntax Tree\WControlFlow.cs" />
     <Compile Include="TSQL Syntax Tree\WCreateViewStatement.cs" />
     <Compile Include="TSQL Syntax Tree\WDeclareVariableStatement.cs" />
-    <Compile Include="View.cs" />
-    <Compile Include="TranslateDataModificationVisitor.cs" />
-    <Compile Include="GetQueryTablesVisitor.cs" />
-    <Compile Include="TableSizeEstimator.cs" />
-    <Compile Include="TranslateMatchClauseVisitor.cs" />
-    <Compile Include="GraphDataModificationAnnotation.cs" />
-    <Compile Include="GraphViewConnection.cs" />
+    <Compile Include="GraphViewConnection\GraphViewConnection.cs" />
     <Compile Include="GraphViewException.cs" />
-    <Compile Include="MatchClauseVisitor.cs" />
-    <Compile Include="GraphViewParser.cs" />
-    <Compile Include="MatchGraph.cs" />
-    <None Include="EdgeViewGraphViewCodeTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>EdgeViewGraphViewCodeTemplate.cs</LastGenOutput>
-    </None>
-    <Compile Include="GraphViewDefinedFunctionGenerator.cs" />
+    <Compile Include="GraphViewQueryCompiler\MatchGraph.cs" />
     <Compile Include="TSQL Syntax Tree\WCallTarget.cs" />
     <Compile Include="TSQL Syntax Tree\WColumnDefinition.cs" />
     <Compile Include="TSQL Syntax Tree\WCommonTableExpression .cs" />
     <Compile Include="TSQL Syntax Tree\WConstraintDefinition.cs" />
     <Compile Include="TSQL Syntax Tree\WCreateTableStatement.cs" />
-    <Compile Include="CollectVariableVisitor.cs" />
     <Compile Include="TSQL Syntax Tree\WDropTableStatement.cs" />
     <Compile Include="TSQL Syntax Tree\WIdentifierOrValueExpression.cs" />
     <Compile Include="TSQL Syntax Tree\WTableHint.cs" />
     <Compile Include="TSQL Syntax Tree\WTransactionStatement.cs" />
-    <Compile Include="WSqlFragmentVisitor.cs" />
+    <Compile Include="VertexObjectCache.cs" />
+    <Compile Include="TSQL Syntax Tree\WSqlFragmentVisitor.cs" />
     <Compile Include="TSQL Syntax Tree\WGraphTableColumn.cs" />
     <Compile Include="TSQL Syntax Tree\WDataTypeReference.cs" />
     <Compile Include="TSQL Syntax Tree\WIdentityOptions.cs" />
     <Compile Include="TSQL Syntax Tree\WIndexDefinition.cs" />
     <Compile Include="TSQL Syntax Tree\WSchemaObjectName.cs" />
     <Compile Include="TSQL Syntax Tree\WTableDefinition.cs" />
-    <Compile Include="WSqlParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TSQL Syntax Tree\TsqlFragmentToString.cs" />
     <Compile Include="TSQL Syntax Tree\WBooleanExpression.cs" />
@@ -139,37 +415,44 @@
     <Compile Include="TSQL Syntax Tree\WSelectQuery.cs" />
     <Compile Include="TSQL Syntax Tree\WSql.cs" />
     <Compile Include="TSQL Syntax Tree\WTableReference.cs" />
-    <Compile Include="WSqlTableContext.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="DeployScriptTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>DeployScriptTemplate.cs</LastGenOutput>
-    </None>
-    <None Include="NodeTableGraphViewCodeTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>NodeTableGraphViewCodeTemplate.cs</LastGenOutput>
-    </None>
+    <Compile Include="GraphViewQueryCompiler\QueryCompilationContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MetaGraphViewCodeTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>MetaGraphViewCodeTemplate.cs</LastGenOutput>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
     </None>
+    <EmbeddedResource Include="Resources\RedisLua\SET_AND_GET_COMMIT_TIME.lua" />
+    <EmbeddedResource Include="Resources\RedisLua\UPDATE_VERSION_MAX_COMMIT_TS.lua" />
+    <EmbeddedResource Include="Resources\RedisLua\UPDATE_COMMIT_LOWER_BOUND.lua" />
+    <EmbeddedResource Include="Resources\RedisLua\REPLACE_VERSION_ENTRY.lua" />
+    <EmbeddedResource Include="Resources\RedisLua\REMOVE_KEYS_WITH_PREFIX.lua" />
+    <EmbeddedResource Include="Resources\RedisLua\DELETE_DIRTY_VERSION.lua" />
+    <EmbeddedResource Include="Resources\RedisLua\GET_VERSION_LIST.lua" />
+    <EmbeddedResource Include="Resources\RedisLua\UPLOAD_NEW_VERSION.lua" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <None Include="EdgeViewBfsScriptTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>EdgeViewBfsScriptTemplate.cs</LastGenOutput>
-    </None>
+    <Content Include="GraphViewExecutionRuntime\Schema.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Microsoft.Azure.DocumentDB.1.9.5\build\Microsoft.Azure.DocumentDB.targets" Condition="Exists('..\packages\Microsoft.Azure.DocumentDB.1.9.5\build\Microsoft.Azure.DocumentDB.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Azure.DocumentDB.1.9.5\build\Microsoft.Azure.DocumentDB.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Azure.DocumentDB.1.9.5\build\Microsoft.Azure.DocumentDB.targets'))" />
+  </Target>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -23,18 +23,25 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Threading.Tasks;
 using GraphView.TSQL_Syntax_Tree;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace GraphView
 {
-    public abstract partial class WSqlFragment 
+    [Serializable]
+    public abstract partial class WSqlFragment// : ISerializable
     {
         public int FirstTokenIndex { get; set; }
         public int LastTokenIndex { get; set; }
+
+        protected WSqlFragment() { }
 
         internal void UpdateTokenInfo(WSqlFragment fragment)
         {
@@ -77,6 +84,11 @@ namespace GraphView
             return "";
         }
 
+        internal virtual string ToString(string indent, bool useSquareBracket)
+        {
+            return ToString(indent);
+        }
+
         public override string ToString()
         {
             return ToString("");
@@ -89,6 +101,36 @@ namespace GraphView
         public virtual void AcceptChildren(WSqlFragmentVisitor visitor)
         {
         }
+        
+        internal virtual GraphViewExecutionOperator Generate(GraphViewConnection dbConnection) 
+        {
+            return null;
+        }
+
+        internal virtual GraphViewExecutionOperator Compile(QueryCompilationContext context, GraphViewCommand command)
+        {
+            return null;
+        }
+
+        internal virtual ExecutionOrder GetLocalExecutionOrder(ExecutionOrder parentExecutionOrder)
+        {
+            ExecutionOrder executionOrder = new ExecutionOrder();
+            executionOrder.Order.Add(new Tuple<CompileNode, CompileLink, List<Tuple<PredicateLink, int>>, List<Tuple<MatchEdge, int>>, List<ExecutionOrder>>(
+                null, null, null, null, new List<ExecutionOrder>()));
+            return executionOrder;
+        }
+
+        //public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        //{
+        //    info.AddValue("FirstTokenIndex", this.FirstTokenIndex, typeof(int));
+        //    info.AddValue("LastTokenIndex", this.LastTokenIndex, typeof(int));
+        //}
+
+        //protected WSqlFragment(SerializationInfo info, StreamingContext context)
+        //{
+        //    this.FirstTokenIndex = info.GetInt32("FirstTokenIndex");
+        //    this.LastTokenIndex = info.GetInt32("LastTokenIndex");
+        //}
     }
 
     public partial class WSqlScript : WSqlFragment
@@ -266,7 +308,7 @@ namespace GraphView
                 var toh = hint as TableHintsOptimizerHint;
                 sb.Append("TABLE HINT ");
                 sb.Append("(");
-                sb.Append(TsqlFragmentToString.SchemaObjectName(toh.ObjectName));
+                // sb.Append(TsqlFragmentToString.WSchemaObjectName(toh.ObjectName));
                 for (int i = 0; i < toh.TableHints.Count; i++)
                 {
                     if (i > 0)
@@ -511,6 +553,143 @@ namespace GraphView
             }
 
             base.AcceptChildren(visitor);
+        }
+    }
+
+    public partial class WSetVariableStatement : WSqlStatement
+    {
+        private List<WScalarExpression> _parameters = new List<WScalarExpression>();
+        private WVariableReference _variable;
+        private SeparatorType _separatorType;
+        private Identifier _identifier;
+        private bool _functionCallExists;
+        private WScalarExpression _expression;
+        private CursorDefinition _cursorDefinition;
+        private AssignmentKind _assignmentKind;
+
+        public WVariableReference Variable
+        {
+            get
+            {
+                return this._variable;
+            }
+            set
+            {
+                this.UpdateTokenInfo((WSqlFragment)value);
+                this._variable = value;
+            }
+        }
+
+        //public SeparatorType SeparatorType
+        //{
+        //    get
+        //    {
+        //        return this._separatorType;
+        //    }
+        //    set
+        //    {
+        //        this._separatorType = value;
+        //    }
+        //}
+
+        public Identifier Identifier
+        {
+            get
+            {
+                return this._identifier;
+            }
+            set
+            {
+                this.UpdateTokenInfo(value);
+                this._identifier = value;
+            }
+        }
+
+        //public bool FunctionCallExists
+        //{
+        //    get
+        //    {
+        //        return this._functionCallExists;
+        //    }
+        //    set
+        //    {
+        //        this._functionCallExists = value;
+        //    }
+        //}
+
+        public IList<WScalarExpression> Parameters
+        {
+            get
+            {
+                return (IList<WScalarExpression>)this._parameters;
+            }
+        }
+
+        public WScalarExpression Expression
+        {
+            get
+            {
+                return this._expression;
+            }
+            set
+            {
+                this.UpdateTokenInfo((WSqlFragment)value);
+                this._expression = value;
+            }
+        }
+
+        public CursorDefinition CursorDefinition
+        {
+            get
+            {
+                return this._cursorDefinition;
+            }
+            set
+            {
+                this.UpdateTokenInfo(value);
+                this._cursorDefinition = value;
+            }
+        }
+
+        //public AssignmentKind AssignmentKind
+        //{
+        //    get
+        //    {
+        //        return this._assignmentKind;
+        //    }
+        //    set
+        //    {
+        //        this._assignmentKind = value;
+        //    }
+        //}
+        internal override string ToString(string indent)
+        {
+            return "SET " + Variable.ToString() + " = " + (Expression.ToString()) + "\r\n";
+        }
+
+        public override void Accept(WSqlFragmentVisitor visitor)
+        {
+            if (visitor == null)
+                return;
+            visitor.Visit(this);
+        }
+
+        public override void AcceptChildren(WSqlFragmentVisitor visitor)
+        {
+            //if (this.Variable != null)
+            //    this.Variable.Accept(visitor);
+            //if (this.Identifier != null)
+            //    this.Identifier.Accept(visitor);
+            //int index = 0;
+            //for (int count = this.Parameters.Count; index < count; ++index)
+            //    this.Parameters[index].Accept(visitor);
+            //if (this.Expression != null)
+            //    this.Expression.Accept(visitor);
+            //if (this.CursorDefinition != null)
+            //    this.CursorDefinition.Accept(visitor);
+            //base.AcceptChildren(visitor);
+            
+            //TODO
         }
     }
 }

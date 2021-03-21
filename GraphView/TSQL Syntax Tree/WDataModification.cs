@@ -23,10 +23,10 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using GraphView.TSQL_Syntax_Tree;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace GraphView
@@ -117,7 +117,7 @@ namespace GraphView
                 InsertSource.Accept(visitor);
 
             var index = 0;
-            if (Columns!=null)
+            if (Columns != null)
                 for (var count = Columns.Count; index < count; ++index)
                     Columns[index].Accept(visitor);
 
@@ -145,6 +145,7 @@ namespace GraphView
             if (visitor != null)
                 visitor.Visit(this);
         }
+        
     }
 
     public partial class WInsertEdgeSpecification : WInsertSpecification
@@ -186,11 +187,85 @@ namespace GraphView
         internal override string ToString(string indent)
         {
             var sb = new StringBuilder();
-            sb.AppendFormat("{0}INSERT EDGE INTO {1}.{2}\r\n", indent, Target.ToString(), EdgeColumn.ToString());
+            //sb.AppendFormat("{0}INSERT EDGE INTO {1}.{2}\r\n", indent, Target.ToString(), EdgeColumn.ToString());
+            //if (EdgeColumn != null)
+            //    sb.AppendFormat("{0}INSERT EDGE INTO {1}.{2}\r\n", indent, Target.ToString(), EdgeColumn.ToString());
+            //else
+            //    sb.AppendFormat("{0}INSERT EDGE INTO {1}\r\n", indent, Target.ToString());
+            sb.AppendFormat("{0}INSERT INTO {1}", indent, Target.ToString());
+            if (Columns != null && Columns.Count > 0)
+            {
+                sb.AppendFormat(" ({0}", Columns[0].ToString(indent));
+                for (var i = 1; i < Columns.Count; ++i)
+                {
+                    sb.AppendFormat(", {0}", Columns[i].ToString(indent));
+                }
+                sb.Append(")");
+            }
+            sb.Append("\r\n");
             sb.Append(SelectInsertSource.ToString(indent));
+
+            //sb.Append(SelectInsertSource.ToString(indent));
+            //sb.Append("\r\n");
             return sb.ToString();
         }
+
+
     }
+
+
+
+    public partial class WInsertEdgeFromTwoSourceSpecification : WInsertSpecification
+    {
+        public WSelectInsertSource SrcInsertSource { get; set; }
+        public WSelectQueryBlock DestInsertSource { get; set; }
+
+        public WColumnReferenceExpression EdgeColumn { get; set; }
+
+        //public GraphTraversal.direction dir { get; set; }
+
+        public WInsertEdgeFromTwoSourceSpecification(WSqlStatement SrcSpec, WSqlStatement DestSpec/*, GraphTraversal.direction pDir*/)
+        {
+            //dir = pDir;
+            SrcInsertSource = (SrcSpec as WInsertEdgeSpecification).SelectInsertSource as WSelectInsertSource;
+            DestInsertSource = DestSpec as WSelectQueryBlock;
+
+            if (SrcInsertSource == null || DestInsertSource == null)
+            {
+                throw new SyntaxErrorException("The insert source of the INSERT EDGE statement must be a SELECT statement.");
+            }
+
+            Target = (SrcSpec as WInsertEdgeSpecification).Target;
+            Columns = new List<WColumnReferenceExpression>();
+            foreach (var col in (SrcSpec as WInsertEdgeSpecification).Columns)
+                Columns.Add(col);
+        }
+
+        public override void Accept(WSqlFragmentVisitor visitor)
+        {
+            if (visitor != null)
+                visitor.Visit(this);
+        }
+
+        public override void AcceptChildren(WSqlFragmentVisitor visitor)
+        {
+
+        }
+
+        internal override string ToString(string indent)
+        {
+            var sb = new StringBuilder();
+            if (EdgeColumn != null)
+                sb.AppendFormat("{0}INSERT EDGE INTO {1}.{2}\r\n", indent, Target.ToString(), EdgeColumn.ToString());
+            else
+                sb.AppendFormat("{0}INSERT EDGE INTO {1}\r\n", indent, Target.ToString());
+            return sb.ToString();
+        }
+
+
+    }
+
+
 
     public partial class WDeleteSpecification : WUpdateDeleteSpecificationBase
     {
@@ -257,6 +332,11 @@ namespace GraphView
             WhereClause = deleteSpec.WhereClause;
         }
 
+        public WDeleteNodeSpecification()
+        {
+            
+        }
+
         public override void Accept(WSqlFragmentVisitor visitor)
         {
             if (visitor != null)
@@ -306,13 +386,13 @@ namespace GraphView
     public partial class WDeleteEdgeSpecification : WDeleteSpecification
     {
         public WSelectQueryBlock SelectDeleteExpr { get; set; }
-        public WEdgeColumnReferenceExpression EdgeColumn { get; set; } 
+        public WEdgeColumnReferenceExpression EdgeColumn { get; set; }
         public WDeleteEdgeSpecification(WSelectQueryBlock deleteSpec)
         {
             SelectDeleteExpr = deleteSpec;
             //FromClause = new WFromClause
             //{
-            //    TableReferences = new List<WTableReference>
+            //    TableReferencesInFromClause = new List<WTableReference>
             //    {
             //        new WQueryDerivedTable
             //        {
@@ -381,6 +461,8 @@ namespace GraphView
 
             return sb.ToString();
         }
+
+
     }
 
     public partial class WUpdateSpecification : WUpdateDeleteSpecificationBase
@@ -400,12 +482,12 @@ namespace GraphView
         internal override string ToString(string indent)
         {
             var sb = new StringBuilder();
-            sb.AppendFormat("{0}UPDATE ", indent);
+            sb.AppendFormat("{0}UPDATE", indent);
             if (TopRowFilter != null)
                 sb.Append(TopRowFilter.ToString(indent));
 
             sb.AppendFormat(" {0} SET \r\n", Target.ToString(indent));
-            
+
             var first = true;
             if (SetClauses != null)
             {
@@ -425,8 +507,9 @@ namespace GraphView
 
             if (FromClause != null)
                 sb.AppendFormat("\r\n{0}{1}", indent, FromClause.ToString(indent));
-            if (WhereClause != null && WhereClause.SearchCondition!=null) 
+            if (WhereClause != null && WhereClause.SearchCondition != null)
                 sb.AppendFormat("\r\n{0}{1}", indent, WhereClause.ToString(indent));
+            sb.Append("\r\n");
             return sb.ToString();
         }
 

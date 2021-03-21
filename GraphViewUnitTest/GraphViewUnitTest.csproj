@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4060ECE6-40A9-4471-8195-8669C5EFA674}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GraphViewUnitTest</RootNamespace>
+    <AssemblyName>GraphViewUnitTest</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;TEST_PARTITION_BY_NAME</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;TEST_PARTITION_BY_NAME</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JsonServer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\JsonServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Azure.Documents.Client, Version=1.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Azure.DocumentDB.1.9.5\lib\net45\Microsoft.Azure.Documents.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.SqlServer.TransactSql.ScriptDom, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SqlServer.TransactSql.ScriptDom.14.0.3811.1\lib\net40\Microsoft.SqlServer.TransactSql.ScriptDom.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Web.Extensions" />
+  </ItemGroup>
+  <Choose>
+    <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+  <ItemGroup>
+    <Compile Include="DocDBQueryPerfTest.cs" />
+    <Compile Include="GremlinFunctionalTestSuite.cs" />
+    <Compile Include="GremlinTranslationOperator.cs" />
+    <Compile Include="Gremlin\AbstractGremlinTest.cs" />
+    <Compile Include="Gremlin\CustomTest.cs" />
+    <Compile Include="Gremlin\GraphData.cs" />
+    <Compile Include="Gremlin\GraphDataLoader.cs" />
+    <Compile Include="Gremlin\ProcessTests\NestingPropertiesTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Barrier\CapTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Branch\ChooseTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Branch\RepeatTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Branch\UnionTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Filter\AndTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Filter\CoinTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Filter\DedupTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Filter\DropTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Filter\FilterTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Filter\HasTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Filter\IsTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Filter\LimitTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Filter\RangeTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Filter\SampleTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Filter\WhereTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\AddVertexTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\CoalesceTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\ConstantTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\GroupTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\PathTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\ProjectTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\PropertiesTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\SelectTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\UnfoldTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\FlatMapTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\FoldTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\GraphSONTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\InjectTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\MapTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\LocalTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\OrTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\StoreTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\TreeTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\VertexTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\SideEffect\LazyCommitTest.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\SideEffect\SubgraphTest.cs" />
+    <Compile Include="IoT61.cs" />
+    <Compile Include="IoT728.cs" />
+    <Compile Include="IOTQueryTest.cs" />
+    <Compile Include="IoTUnitTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="GraphViewMarvelTest.cs" />
+    <Compile Include="ShortestPathTest.cs" />
+    <Compile Include="TestPartition.cs" />
+    <Compile Include="TinkPopJsonParser.cs" />
+    <Compile Include="TestLarge.cs" />
+    <Compile Include="Gremlin\ProcessTests\Traversal\Step\Map\AddEdgeTest.cs" />
+    <Compile Include="Utils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GraphView\GraphView.csproj">
+      <Project>{33cadc4a-376f-489b-8357-be60d8f6186a}</Project>
+      <Name>GraphViewParser</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BulkInsert.js" />
+    <Content Include="ClearDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WorkLoadTest.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Choose>
+    <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.CodedUITestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Extension, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITesting, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.Sql.UnitTesting.targets" Condition="'$(SQLDBExtensionsRefPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.Sql.UnitTesting.targets" Condition="'$(SQLDBExtensionsRefPath)' == ''" />
+  <PropertyGroup>
+    <SsdtUnitTestVersion>2.0</SsdtUnitTestVersion>
+  </PropertyGroup>
+  <Import Project="..\packages\Microsoft.Azure.DocumentDB.1.9.5\build\Microsoft.Azure.DocumentDB.targets" Condition="Exists('..\packages\Microsoft.Azure.DocumentDB.1.9.5\build\Microsoft.Azure.DocumentDB.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Azure.DocumentDB.1.9.5\build\Microsoft.Azure.DocumentDB.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Azure.DocumentDB.1.9.5\build\Microsoft.Azure.DocumentDB.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

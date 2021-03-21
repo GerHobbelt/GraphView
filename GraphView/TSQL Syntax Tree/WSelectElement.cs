@@ -24,10 +24,24 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 using System.Globalization;
+using GraphView.TSQL_Syntax_Tree;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace GraphView
 {
+    public enum AssignmentKind
+    {
+        AddEquals,
+        BitwiseAndEquals,
+        BitwiseOrEquals,
+        BitwiseXorEquals,
+        DivideEquals,
+        Equals,
+        ModEquals,
+        MultiplyEquals,
+        SubtractEquals
+    }
+
     /// <summary>
     /// Three types of elements in the SELECT clause:
     /// 1) scalar expressions.
